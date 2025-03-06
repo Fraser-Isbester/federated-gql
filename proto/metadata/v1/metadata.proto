@@ -6,6 +6,39 @@ import "google/protobuf/descriptor.proto";
 
 option go_package = "github.com/fraser-isbester/federated-gql/gen/go/metadata/v1;metadatav1";
 
+// Relationship type enumerates the possible types of entity relationships
+enum RelationshipType {
+  // Default relationship type
+  RELATIONSHIP_TYPE_UNSPECIFIED = 0;
+  // One-to-one relationship
+  RELATIONSHIP_TYPE_ONE_TO_ONE = 1;
+  // One-to-many relationship
+  RELATIONSHIP_TYPE_ONE_TO_MANY = 2;
+  // Many-to-one relationship
+  RELATIONSHIP_TYPE_MANY_TO_ONE = 3;
+  // Many-to-many relationship
+  RELATIONSHIP_TYPE_MANY_TO_MANY = 4;
+}
+
+// Relationship defines properties of an entity relationship
+message Relationship {
+  // Type of relationship (one-to-one, one-to-many, etc.)
+  RelationshipType type = 1;
+  
+  // Fully qualified type reference (package.v1.Type)
+  // Example: "user.v1.User"
+  // If the field is already a message type, this can be omitted
+  string target_type = 2;
+  
+  // Reference to the field in the target entity (defaults to "id" if not specified)
+  string target_field = 3;
+  
+  // Reference to the inverse edge in the target entity
+  // When defined, creates a bidirectional relationship
+  // If not explicitly set, will be auto-generated based on pluralization rules
+  string inverse_edge = 4;
+}
+
 // Field options extend the standard protocol buffer field options
 extend google.protobuf.FieldOptions {
   // Identifies this field as a key field for the containing entity
@@ -24,6 +57,10 @@ extend google.protobuf.FieldOptions {
   // Specifies that this field is computed from fields of other services
   // For GraphQL federation, this corresponds to the @computed directive
   string computed_from = 50004;
+  
+  // Defines a relationship to another entity across service boundaries
+  // Similar to ent framework's edge definitions
+  Relationship edge = 50005;
 }
 
 // Message options extend the standard protocol buffer message options
@@ -37,6 +74,10 @@ extend google.protobuf.MessageOptions {
   // Specifies the resolvers for this entity in other services
   // For GraphQL federation, this helps with proper reference resolution
   repeated string provides = 50002;
+  
+  // Defines all relationships (edges) this entity has with other entities
+  // Useful for schema generation and documentation
+  repeated Relationship edges = 50003;
 }
 
 // Service options extend the standard protocol buffer service options
