@@ -7,6 +7,7 @@ require (
 	github.com/99designs/gqlgen v0.17.66
 	github.com/fraser-isbester/federated-gql/gen/go v0.0.0-20250224025919-47a37e4bc4f6
 	github.com/go-chi/chi/v5 v5.2.1
+	github.com/go-chi/cors v1.2.1
 	github.com/gorilla/websocket v1.5.0
 	github.com/vektah/gqlparser/v2 v2.5.22
 )
