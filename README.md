@@ -74,6 +74,46 @@ If the specified template file is not found, the generator will fall back to usi
 - **Federation metadata**: Extended protocol buffer definitions for federation
 - **Custom code generator**: Creates GraphQL schemas from Proto definitions
 - **Connect protocol**: Modern, lightweight gRPC alternative
+- **Entity relationships**: User-Product relationships expressed via Protocol Buffer fields
+
+## Example of User-Product Federation
+
+The Product service includes a `user_id` field that creates an edge to the User service. This enables queries like:
+
+```graphql
+# Query a product and its owner
+query GetProductWithOwner {
+  product(productID: "123") {
+    productID
+    name
+    price
+    userID   # This field links to the User entity
+  }
+}
+
+# Query a user by ID
+query GetUser {
+  user(userID: "456") {
+    userID
+    name
+  }
+}
+
+# With federation, this relationship could be extended to create queries like:
+# (This would require implementing the appropriate resolvers)
+# 
+# query GetProductWithOwnerDetails {
+#   product(productID: "123") {
+#     productID
+#     name
+#     price
+#     user {   # This would be a resolver that uses the userID to fetch the User
+#       userID
+#       name
+#     }
+#   }
+# }
+```
 
 ## Project Structure
 

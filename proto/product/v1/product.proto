@@ -32,6 +32,8 @@ message Product {
     string name = 2;
     // The price of the product.
     double price = 3;
+    // The ID of the user who owns this product.
+    string user_id = 4;
 }
 
 // Order is a product order.
