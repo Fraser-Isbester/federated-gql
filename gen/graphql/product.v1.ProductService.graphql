@@ -34,11 +34,6 @@ type Product @key(fields: "product_id") {
   """
   price: String!
     
-  """
-  The ID of the user who owns this product.
-  """
-  user_id: String!
-    
 }
 """
 Order is a product order.
@@ -64,4 +59,17 @@ type Order @key(fields: "order_id") {
   """
   total_price: String!
     
+  """
+  The ID of the user who placed this order.
+  """
+  user_id: String!
+    
+  # Reference to the user who placed this order
+  user: User @requires(fields: "user_id")
+}
+
+# Generate extensions for User type if we have Order type with user_id field
+extend type User @key(fields: "userID") {
+  # Orders placed by this user
+  orders: [Order] @requires(fields: "userID")
 }

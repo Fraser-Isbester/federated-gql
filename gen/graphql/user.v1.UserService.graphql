@@ -27,3 +27,5 @@ type User @key(fields: "user_id") {
   name: String!
     
 }
+
+# Generate extensions for User type if we have Order type with user_id field

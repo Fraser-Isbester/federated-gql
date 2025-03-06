@@ -72,6 +72,30 @@ type {{ .Name }} @key(fields: "{{ $keyFields := "" }}{{ range $i, $f := .Fields 
     {{- range .ReferenceMethods }}
   {{ .Name }}{{ .InputArgs }}: {{ .OutputType }}
     {{- end }}
+
+    {{- if eq .Name "Order" }}
+  # Reference to the user who placed this order
+  user: User @requires(fields: "user_id")
+    {{- end }}
 }
   {{- end }}
+{{- end }}
+
+# Generate extensions for User type if we have Order type with user_id field
+{{- $hasOrderWithUserId := false }}
+{{- range .Messages }}
+  {{- if eq .Name "Order" }}
+    {{- range .Fields }}
+      {{- if eq .Name "user_id" }}
+        {{- $hasOrderWithUserId = true }}
+      {{- end }}
+    {{- end }}
+  {{- end }}
+{{- end }}
+
+{{- if $hasOrderWithUserId }}
+extend type User @key(fields: "userID") {
+  # Orders placed by this user
+  orders: [Order] @requires(fields: "userID")
+}
 {{- end }}
