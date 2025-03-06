@@ -4,6 +4,7 @@ package product.v1;
 option go_package = "github.com/fraser-isbester/federated-gql/gen/go/product/v1;productv1";
 
 import "metadata/v1/metadata.proto";
+import "user/v1/user.proto";
 
 service ProductService {
     // GetProduct returns a product by its ID.
@@ -28,8 +29,10 @@ message Product {
 
     // The ID of the product.
     string product_id = 1 [(metadata.v1.key) = true];
+    
     // The name of the product.
     string name = 2;
+    
     // The price of the product.
     double price = 3;
 }
@@ -40,10 +43,20 @@ message Order {
 
     // The ID of the order.
     string order_id = 1 [(metadata.v1.key) = true];
-    // The ID of the product.
-    string product_id = 2;
+    
+    // The product in this order.
+    Product product = 2 [(metadata.v1.edge) = {
+        type: RELATIONSHIP_TYPE_MANY_TO_ONE
+    }];
+    
     // The quantity of the product.
     int32 quantity = 3;
+    
     // The total price of the order.
     double total_price = 4;
+    
+    // The user who placed this order.
+    user.v1.User user = 5 [(metadata.v1.edge) = {
+        type: RELATIONSHIP_TYPE_MANY_TO_ONE
+    }];
 }

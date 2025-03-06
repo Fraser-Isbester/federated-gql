@@ -6,6 +6,55 @@ import "google/protobuf/descriptor.proto";
 
 option go_package = "github.com/fraser-isbester/federated-gql/gen/go/metadata/v1;metadatav1";
 
+// Relationship type enumerates the possible types of entity relationships
+enum RelationshipType {
+  // Default relationship type
+  RELATIONSHIP_TYPE_UNSPECIFIED = 0;
+  // One-to-one relationship
+  RELATIONSHIP_TYPE_ONE_TO_ONE = 1;
+  // One-to-many relationship
+  RELATIONSHIP_TYPE_ONE_TO_MANY = 2;
+  // Many-to-one relationship
+  RELATIONSHIP_TYPE_MANY_TO_ONE = 3;
+  // Many-to-many relationship
+  RELATIONSHIP_TYPE_MANY_TO_MANY = 4;
+}
+
+// Relationship defines properties of an entity relationship
+// This is used for modeling relationships in federated services
+message Relationship {
+  // Type of relationship (one-to-one, one-to-many, etc.)
+  // If not specified, will be inferred from field type when possible
+  RelationshipType type = 1;
+  
+  // Fully qualified type reference (package.v1.Type)
+  // Example: "user.v1.User"
+  // Optional when the field is already a message type reference
+  string target_type = 2;
+  
+  // Reference to the field(s) in the target entity
+  // Defaults to "id" if not specified
+  // For composite keys, multiple fields can be specified
+  repeated string target_field = 3;
+  
+  // Reference to the inverse edge in the target entity
+  // When defined, creates a bidirectional relationship
+  // If not specified, an appropriate name will be generated
+  string inverse_edge = 4;
+  
+  // Storage-level configuration for the relationship
+  message StorageConfig {
+    // Table name for join table (if applicable)
+    string join_table = 1;
+    
+    // Custom field mappings for storage implementation
+    map<string, string> field_mappings = 2;
+  }
+  
+  // Storage configuration for this relationship
+  StorageConfig storage_config = 5;
+}
+
 // Field options extend the standard protocol buffer field options
 extend google.protobuf.FieldOptions {
   // Identifies this field as a key field for the containing entity
@@ -24,6 +73,9 @@ extend google.protobuf.FieldOptions {
   // Specifies that this field is computed from fields of other services
   // For GraphQL federation, this corresponds to the @computed directive
   string computed_from = 50004;
+  
+  // Defines a relationship to another entity across service boundaries
+  Relationship edge = 50005;
 }
 
 // Message options extend the standard protocol buffer message options
@@ -37,6 +89,10 @@ extend google.protobuf.MessageOptions {
   // Specifies the resolvers for this entity in other services
   // For GraphQL federation, this helps with proper reference resolution
   repeated string provides = 50002;
+  
+  // Defines all relationships (edges) this entity has with other entities
+  // Useful for schema generation and documentation
+  repeated Relationship edges = 50003;
 }
 
 // Service options extend the standard protocol buffer service options
